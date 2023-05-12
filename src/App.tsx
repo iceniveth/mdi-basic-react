@@ -10,7 +10,7 @@ export type TodoItemType = {
 function App() {
   const [task, setTask] = useState("");
   const [todos, setTodos] = useState<TodoItemType[]>([]);
-  const taskRef = useRef<HTMLInputElement>();
+  const taskRef = useRef<HTMLInputElement>(null);
 
   const onTodoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTask(e.target.value);
