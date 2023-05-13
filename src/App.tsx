@@ -9,6 +9,12 @@ export type TodoItemType = {
   checked: boolean;
 };
 
+// E-Commerce projects from the former batch:
+// - https://iridescent-belekoy-72f60d.netlify.app/
+// - https://cincocicd.netlify.app/
+// - https://mock-ecommerce-reactjs.netlify.app/
+// - https://641afc7f1233c1070f73bd1a--incomparable-sable-0aff20.netlify.app/
+
 function App() {
   return (
     <>
