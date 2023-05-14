@@ -2,6 +2,9 @@ import { Link, Route, Switch } from "wouter";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
 import ViewProduct from "./pages/ViewProduct";
+import { CartProvider } from "./contexts/CartContext";
+import CartCount from "./CartCount";
+import Cart from "./pages/Cart";
 
 export type TodoItemType = {
   id: number;
@@ -18,16 +21,22 @@ export type TodoItemType = {
 function App() {
   return (
     <>
-      <div style={{ display: "flex", gap: "8px" }}>
-        <Link href="/">Home</Link>
-        <Link href="/products">Products</Link>
-      </div>
+      <CartProvider>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <Link href="/">Home</Link>
+          <Link href="/products">Products</Link>
 
-      <Switch>
-        <Route path="/products/:productId" component={ViewProduct} />
-        <Route path="/products" component={Products} />
-        <Route path="/" component={Home} />
-      </Switch>
+          <div style={{ flexGrow: 1 }} />
+          <CartCount />
+        </div>
+
+        <Switch>
+          <Route path="/cart" component={Cart} />
+          <Route path="/products/:productId" component={ViewProduct} />
+          <Route path="/products" component={Products} />
+          <Route path="/" component={Home} />
+        </Switch>
+      </CartProvider>
     </>
   );
 }

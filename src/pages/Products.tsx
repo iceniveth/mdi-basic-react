@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import { useCartContext } from "../contexts/CartContext";
 
-type Product = {
+export type Product = {
   id: number;
   category: string;
   description: string;
@@ -14,6 +15,7 @@ type Product = {
 export default function Products() {
   const [_, setLocation] = useLocation();
   const [products, setProducts] = useState<Product[]>([]);
+  const { dispatch } = useCartContext();
 
   useEffect(() => {
     fetch("https://fakestoreapi.com/products")
@@ -40,12 +42,26 @@ export default function Products() {
             </p>
             <p style={{ fontSize: ".6rem" }}>{product.description}</p>
             <button
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               onClick={() => {
                 setLocation(`/products/${product.id}`);
               }}
             >
               View
+            </button>
+            <div style={{ margin: "8px" }} />
+            <button
+              style={{
+                width: "100%",
+                backgroundColor: "red",
+                border: "1px solid red",
+                color: "white",
+              }}
+              onClick={() => {
+                dispatch({ type: "addToCart", product });
+              }}
+            >
+              Add to Cart
             </button>
           </div>
         ))}
