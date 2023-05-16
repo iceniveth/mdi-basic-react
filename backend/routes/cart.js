@@ -1,57 +1,63 @@
 import express from 'express';
 import { z } from 'zod';
+import { cartCollection } from '../db.js'
+import { ObjectId } from 'mongodb';
 
 const router = express.Router();
 
 const CartSchema = z.object({
-  id: z.number(),
   title: z.string(),
   quantity: z.number(),
 })
 
-let cart = [
-  { id: 1, title: 'Jacket', quantity: 1 }
-];
-// get
-// add to Cart
-// increment/decrement items sa cart
-// remove an item cart
-// remove all cart items.
-
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
+  const cart = await cartCollection.find().toArray()
   res.status(200).send(cart);
 })
 
-router.post('/', (req, res) => {
-  const newCartItem = { ...req.body, id: new Date().getTime() }
-
+router.post('/', async (req, res) => {
+  const newCartItem = req.body
   const parsedResult = CartSchema.safeParse(newCartItem)
 
-  if (!parsedResult.success) {
-    return res.status(400).send(parsedResult.error)
-  }
+  if (!parsedResult.success) return res.status(400).send(parsedResult.error)
 
-  cart = [...cart, parsedResult.data]
-  res.status(201).send(parsedResult.data)
+  const result = await cartCollection.insertOne(parsedResult.data)
+  const { insertedId } = result
+  const cartItem = await cartCollection.findOne({ _id: new ObjectId(insertedId) })
+  res.status(201).send(cartItem)
 })
 
-// /api/cart/2
-router.patch('/:id', (req, res) => {
+router.patch('/:id', async (req, res) => {
+  const cartId = req.params.id;
+  const { quantity } = req.body
+
+  if (!ObjectId.isValid(cartId)) return res.status(400).send('Invalid ID')
+
+  const foundCartItem = await cartCollection.findOne({ _id: new ObjectId(cartId) })
+  if (foundCartItem == null) return res.status(404).send('Not Found')
+
+  const parsedResult = CartSchema.safeParse({ ...foundCartItem, quantity })
+  if (!parsedResult.success) return res.status(400).send(parsedResult.error)
+
+  await cartCollection.updateOne({ _id: new ObjectId(cartId) }, { $set: { quantity } })
+  const cartItem = await cartCollection.findOne({ _id: new ObjectId(cartId) })
+  res.status(200).send(cartItem)
+})
+
+router.delete('/:id', async (req, res) => {
   const cartId = req.params.id;
 
-  const foundIndex = cart.findIndex(ci => ci.id === Number(cartId))
+  if (!ObjectId.isValid(cartId)) return res.status(400).send('Invalid ID')
 
-  if (foundIndex === -1) {
-    res.status(404).send('Not Found')
-  } else {
-    cart[foundIndex].quantity = req.body.quantity
-    res.status(200).send(cart[foundIndex])
-  }
+  const foundCartItem = await cartCollection.findOne({ _id: new ObjectId(cartId) })
+  if (foundCartItem == null) return res.status(404).send('Not Found')
 
+  await cartCollection.deleteOne({ _id: new ObjectId(cartId) })
+  res.status(204).send()
 })
 
-router.delete('/', (req, res) => {
-  cart = [];
+router.delete('/', async (req, res) => {
+  await cartCollection.deleteMany({})
   res.status(204).send()
 })
 
