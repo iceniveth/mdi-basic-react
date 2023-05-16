@@ -1,0 +1,20 @@
+POST http://localhost:8081/api/cart
+Content-Type: application/json
+
+{
+  "title": "Laptop",
+  "quantity": 1
+}
+
+###
+
+PATCH http://localhost:8081/api/cart/1
+Content-Type: application/json
+
+{
+  "quantity": 5
+}
+
+###
+
+DELETE http://localhost:8081/api/cart
