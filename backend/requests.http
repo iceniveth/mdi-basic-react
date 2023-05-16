@@ -1,19 +1,27 @@
+GET http://localhost:8081/api/cart
+
+### 
+
 POST http://localhost:8081/api/cart
 Content-Type: application/json
 
 {
-  "title": "Laptop",
+  "title": "Fish",
   "quantity": 1
 }
 
 ###
 
-PATCH http://localhost:8081/api/cart/1
+PATCH http://localhost:8081/api/cart/646352f51d0c6a5a6c5107ca
 Content-Type: application/json
 
 {
-  "quantity": 5
+  "quantity": 12
 }
+
+###
+
+DELETE http://localhost:8081/api/cart/646352ed1d0c6a5a6c5107c9
 
 ###
 
