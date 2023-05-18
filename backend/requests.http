@@ -6,8 +6,7 @@ POST http://localhost:8081/api/cart
 Content-Type: application/json
 
 {
-  "title": "Fish",
-  "quantity": 1
+  "title": "Fish2123"
 }
 
 ###
