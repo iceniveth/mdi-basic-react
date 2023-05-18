@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useCartContext } from "../contexts/CartContext";
+import { addToCart } from "../apis/cart";
 
 export type Product = {
   id: number;
@@ -30,6 +31,7 @@ export default function Products() {
       <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
         {products.map((product) => (
           <div
+            key={product.id}
             style={{ padding: "8px", border: "2px grey solid", width: "160px" }}
           >
             <img
@@ -58,7 +60,12 @@ export default function Products() {
                 color: "white",
               }}
               onClick={() => {
-                dispatch({ type: "addToCart", product });
+                addToCart({
+                  title: product.title,
+                  productId: product.id,
+                }).then((cartItem) =>
+                  dispatch({ type: "addToCart", cartItem })
+                );
               }}
             >
               Add to Cart

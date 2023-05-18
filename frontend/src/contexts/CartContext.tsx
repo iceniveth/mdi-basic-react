@@ -5,16 +5,21 @@ import {
   useContext,
   useReducer,
 } from "react";
-import { Product } from "../pages/Products";
+import { getCart } from "../apis/cart";
 
-type CartItem = Product & { quantity: number };
+export type CartItem = {
+  _id: string;
+  title: string;
+  quantity: number;
+  productId: number;
+};
 
 type State = {
   cart: CartItem[];
 };
 
 type Action =
-  | { type: "addToCart"; product: Product }
+  | { type: "addToCart"; cartItem: CartItem }
   | { type: "increaseQuantity"; productId: number }
   | { type: "decreaseQuantity"; productId: number }
   | { type: "removeFromCart"; productId: number }
@@ -35,7 +40,7 @@ const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "addToCart": {
       const foundIndex = state.cart.findIndex(
-        (ci) => ci.id === action.product.id
+        (ci) => ci.productId === action.cartItem.productId
       );
 
       const isAlreadyInCart = foundIndex >= 0;
@@ -49,8 +54,7 @@ const reducer = (state: State, action: Action): State => {
           ),
         };
       } else {
-        const cartItem: CartItem = { ...action.product, quantity: 1 };
-        return { cart: state.cart.concat(cartItem) };
+        return { cart: state.cart.concat(action.cartItem) };
       }
     }
 
@@ -60,7 +64,7 @@ const reducer = (state: State, action: Action): State => {
 
     case "increaseQuantity": {
       const updatedCart = state.cart.map((cartItem) =>
-        cartItem.id === action.productId
+        cartItem.productId === action.productId
           ? { ...cartItem, quantity: cartItem.quantity + 1 }
           : cartItem
       );
@@ -68,7 +72,12 @@ const reducer = (state: State, action: Action): State => {
     }
 
     case "decreaseQuantity": {
-      throw new Error("Implement decreaseQuantity");
+      const updatedCart = state.cart.map((cartItem) =>
+        cartItem.productId === action.productId
+          ? { ...cartItem, quantity: cartItem.quantity - 1 }
+          : cartItem
+      );
+      return { cart: updatedCart };
     }
 
     case "removeFromCart": {
@@ -80,10 +89,12 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
+const defaultCart = await getCart();
+
 export const CartProvider: FunctionComponent<PropsWithChildren> = ({
   children,
 }) => {
-  const [state, dispatch] = useReducer(reducer, { cart: [] });
+  const [state, dispatch] = useReducer(reducer, { cart: defaultCart });
 
   return (
     <CartContext.Provider value={{ cart: state.cart, dispatch }}>
